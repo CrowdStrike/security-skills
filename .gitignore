@@ -3,3 +3,5 @@
 .git/
 **/.action_cache.json
 __pycache__/
+.venv/
+.pytest_cache/
