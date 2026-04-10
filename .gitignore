@@ -1,6 +1,7 @@
 .env
 .gitattributes
 .git/
+.idea/
 **/.action_cache.json
 __pycache__/
 .venv/
