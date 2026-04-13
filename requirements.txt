@@ -1,3 +1,0 @@
-crowdstrike-falconpy
-pylint
-pytest

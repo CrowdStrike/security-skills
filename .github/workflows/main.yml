@@ -20,11 +20,11 @@ jobs:
           python-version: "3.12"
           cache: pip
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r plugins/fusion-workflows/requirements.txt
       - name: Pylint
-        run: pylint plugins/fusion-workflows/skills/fusion-workflows/scripts/*.py
+        run: pylint --rcfile=plugins/fusion-workflows/.pylintrc plugins/fusion-workflows/skills/fusion-workflows/scripts/*.py
       - name: Shellcheck
-        run: shellcheck test-scripts.sh test-e2e.sh
+        run: shellcheck plugins/fusion-workflows/test-scripts.sh plugins/fusion-workflows/test-e2e.sh
 
   test:
     runs-on: ubuntu-latest
@@ -36,9 +36,9 @@ jobs:
           python-version: "3.12"
           cache: pip
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r plugins/fusion-workflows/requirements.txt
       - name: Run tests
-        run: pytest tests/ -v
+        run: pytest plugins/fusion-workflows/tests/ -v
 
   validate:
     runs-on: ubuntu-latest
