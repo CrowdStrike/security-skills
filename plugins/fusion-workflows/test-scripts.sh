@@ -9,9 +9,9 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
-SCRIPTS_DIR="$REPO_ROOT/plugins/fusion-workflows/skills/fusion-workflows/scripts"
-ASSETS_DIR="$REPO_ROOT/plugins/fusion-workflows/skills/fusion-workflows/assets"
+PLUGIN_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPTS_DIR="$PLUGIN_DIR/skills/fusion-workflows/scripts"
+ASSETS_DIR="$PLUGIN_DIR/skills/fusion-workflows/assets"
 PASS=0
 FAIL=0
 SKIP=0
@@ -37,9 +37,9 @@ echo "────────────────────────�
 
 # Check for credentials
 if [[ -z "${CS_CLIENT_ID:-}" || -z "${CS_CLIENT_SECRET:-}" ]]; then
-    if [[ -f "$REPO_ROOT/.env" ]]; then
+    if [[ -f "$PLUGIN_DIR/.env" ]]; then
         # shellcheck disable=SC1091
-        source "$REPO_ROOT/.env" 2>/dev/null || true
+        source "$PLUGIN_DIR/.env" 2>/dev/null || true
     fi
 fi
 

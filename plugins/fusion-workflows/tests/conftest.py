@@ -12,8 +12,6 @@ import pytest
 SCRIPTS_DIR = os.path.join(
     os.path.dirname(__file__),
     "..",
-    "plugins",
-    "fusion-workflows",
     "skills",
     "fusion-workflows",
     "scripts",
@@ -29,7 +27,9 @@ def clean_env(monkeypatch):
     monkeypatch.delenv("CS_CLIENT_ID", raising=False)
     monkeypatch.delenv("CS_CLIENT_SECRET", raising=False)
     monkeypatch.delenv("CS_BASE_URL", raising=False)
-    monkeypatch.delenv("CS_ENV_FILE", raising=False)
+    # Point CS_ENV_FILE to a nonexistent path so load_env() won't walk up
+    # and find a real .env file on the developer's machine.
+    monkeypatch.setenv("CS_ENV_FILE", "/nonexistent/.env")
     cs_auth.reset_client()
 
 
