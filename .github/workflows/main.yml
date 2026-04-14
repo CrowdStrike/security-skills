@@ -1,0 +1,80 @@
+name: Security Skills CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r plugins/fusion-workflows/requirements.txt
+      - name: Pylint
+        run: pylint --rcfile=plugins/fusion-workflows/.pylintrc plugins/fusion-workflows/skills/fusion-workflows/scripts/*.py
+      - name: Shellcheck
+        run: shellcheck plugins/fusion-workflows/test-scripts.sh plugins/fusion-workflows/test-e2e.sh
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r plugins/fusion-workflows/requirements.txt
+      - name: Run tests
+        run: pytest plugins/fusion-workflows/tests/ -v
+
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      - name: Validate plugin.json
+        run: python3 -m json.tool plugins/fusion-workflows/.claude-plugin/plugin.json > /dev/null
+      - name: Validate marketplace.json
+        run: python3 -m json.tool .claude-plugin/marketplace.json > /dev/null
+      - name: Validate SKILL.md frontmatter
+        run: |
+          fail=0
+          for skill in plugins/fusion-workflows/skills/*/SKILL.md; do
+            for field in name description; do
+              if ! head -20 "$skill" | grep -q "^${field}:"; then
+                echo "FAIL: $skill missing '$field' in frontmatter"
+                fail=1
+              fi
+            done
+          done
+          exit $fail
+      - name: Check YAML templates
+        run: |
+          pip install pyyaml
+          python3 -c "
+          import yaml, glob, sys
+          files = glob.glob('plugins/fusion-workflows/skills/fusion-workflows/assets/*.yaml')
+          errors = 0
+          for f in files:
+              try:
+                  with open(f) as fh:
+                      yaml.safe_load(fh)
+              except yaml.YAMLError as e:
+                  print(f'INVALID: {f}: {e}')
+                  errors += 1
+          if errors:
+              sys.exit(1)
+          print(f'All {len(files)} YAML files valid')
+          "
