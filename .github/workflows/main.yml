@@ -21,8 +21,10 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install -r plugins/fusion-workflows/requirements.txt
-      - name: Pylint
+      - name: Pylint (fusion-workflows)
         run: pylint --rcfile=plugins/fusion-workflows/.pylintrc plugins/fusion-workflows/skills/fusion-workflows/scripts/*.py
+      - name: Pylint (lookup-files)
+        run: pylint --rcfile=plugins/fusion-workflows/.pylintrc plugins/fusion-workflows/skills/lookup-files/scripts/*.py
       - name: Shellcheck
         run: shellcheck plugins/fusion-workflows/test-scripts.sh plugins/fusion-workflows/test-e2e.sh
 
