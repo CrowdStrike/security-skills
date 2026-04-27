@@ -12,13 +12,13 @@
     {
       "name": "fusion-workflows",
       "source": "./plugins/fusion-workflows",
-      "description": "Create, validate, import, execute, and export CrowdStrike Falcon Fusion SOAR workflows using natural language.",
+      "description": "Create, validate, import, execute, and export CrowdStrike Falcon Fusion SOAR workflows, and manage Falcon Next-Gen SIEM lookup files using natural language.",
       "version": "1.0.0",
       "author": { "name": "Paul Price" },
       "homepage": "https://darkport.co.uk",
       "repository": "https://github.com/eth0izzle/security-skills",
       "license": "MIT",
-      "keywords": ["crowdstrike", "falcon", "fusion", "soar", "workflow", "security"],
+      "keywords": ["crowdstrike", "falcon", "fusion", "soar", "workflow", "security", "ngsiem", "siem", "lookup"],
       "category": "security"
     }
   ]
