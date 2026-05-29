@@ -19,37 +19,23 @@ Install individual skills to automate specific platforms, or combine several for
 
 ### Install via Plugin Marketplace
 
-**CrowdStrike fork (latest with all merged PRs):**
-```bash
-/plugin marketplace add https://github.com/CrowdStrike/security-skills.git
-/plugin install fusion-workflows@security-skills
-```
-
-**Original upstream (stable):**
 ```bash
 /plugin marketplace add https://github.com/eth0izzle/security-skills.git
 /plugin install fusion-workflows@security-skills
 ```
 
-Both repos provide the same `fusion-workflows` plugin with two skills:
+This installs the `fusion-workflows` plugin, which provides two skills:
 - `fusion-workflows` — create, validate, import, execute, and export Fusion SOAR workflows
 - `lookup-files` — manage Falcon Next-Gen SIEM lookup files
-
-The CrowdStrike fork includes the latest improvements before they're contributed upstream.
 
 ### Manual Setup
 
 If you prefer to install manually:
 
-1. Clone the repository (CrowdStrike fork or upstream):
+1. Clone the repository:
 
 ```bash
-# CrowdStrike fork (latest)
-git clone https://github.com/CrowdStrike/security-skills.git
-
-# OR upstream (stable)
 git clone https://github.com/eth0izzle/security-skills.git
-
 cd security-skills
 cp -r plugins/ ~/.claude/plugins/
 ```
