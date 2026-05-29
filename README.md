@@ -20,7 +20,7 @@ Install individual skills to automate specific platforms, or combine several for
 ### Install via Plugin Marketplace
 
 ```bash
-/plugin marketplace add https://github.com/eth0izzle/security-skills.git
+/plugin marketplace add https://github.com/eth0izzle/security-skills
 /plugin install fusion-workflows@security-skills
 ```
 
