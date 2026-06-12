@@ -95,6 +95,11 @@ def _validate_action(label, action, issues):
             f"ERROR: Action '{label}' has invalid id '{action['id']}' "
             f"(must be 32-char hex)"
         )
+    elif len(set(str(action["id"]))) == 1:
+        issues.append(
+            f"ERROR: Action '{label}' has a fake id '{action['id']}' "
+            f"(all-same-character). Run action_search.py to get the real ID."
+        )
     if "name" not in action:
         issues.append(f"ERROR: Action '{label}' missing required 'name' field")
     if "class" in action and "version_constraint" not in action:
