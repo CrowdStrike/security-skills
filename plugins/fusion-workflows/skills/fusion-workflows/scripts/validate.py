@@ -156,21 +156,29 @@ def _validate_conditions(data, issues):
     CEL expressions (cel_expression) do not support else branching.
     FQL expressions (expression) alone support else. Model mutually exclusive
     conditions as parallel branches instead.
+
+    Checks both top-level conditions and conditions nested inside loops.
     """
-    conditions = data.get("conditions", {})
-    if not isinstance(conditions, dict):
-        return
+    def _check_conditions_block(conditions):
+        if not isinstance(conditions, dict):
+            return
+        for label, condition in conditions.items():
+            if not isinstance(condition, dict):
+                continue
+            if "cel_expression" in condition and "else" in condition:
+                issues.append(
+                    f"ERROR: Condition '{label}' has both cel_expression and else. "
+                    f"cel_expression does not support else — model mutually exclusive "
+                    f"conditions as separate parallel branches instead (one per branch, no else)."
+                )
 
-    for label, condition in conditions.items():
-        if not isinstance(condition, dict):
-            continue
+    _check_conditions_block(data.get("conditions", {}))
 
-        if "cel_expression" in condition and "else" in condition:
-            issues.append(
-                f"ERROR: Condition '{label}' has both cel_expression and else. "
-                f"cel_expression does not support else — model mutually exclusive "
-                f"conditions as separate parallel branches instead (one per branch, no else)."
-            )
+    loops = data.get("loops", {})
+    if isinstance(loops, dict):
+        for loop_def in loops.values():
+            if isinstance(loop_def, dict):
+                _check_conditions_block(loop_def.get("conditions", {}))
 
 
 def _validate_data_refs(file_path, issues):
