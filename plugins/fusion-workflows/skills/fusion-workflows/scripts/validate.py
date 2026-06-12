@@ -95,6 +95,11 @@ def _validate_action(label, action, issues):
             f"ERROR: Action '{label}' has invalid id '{action['id']}' "
             f"(must be 32-char hex)"
         )
+    elif len(set(str(action["id"]))) == 1:
+        issues.append(
+            f"ERROR: Action '{label}' has a fake id '{action['id']}' "
+            f"(all-same-character). Run action_search.py to get the real ID."
+        )
     if "name" not in action:
         issues.append(f"ERROR: Action '{label}' missing required 'name' field")
     if "class" in action and "version_constraint" not in action:
@@ -148,6 +153,37 @@ def _validate_loops(data, trigger, all_labels, issues):
                 f"'{loop_input}' in for.input but it is not "
                 f"defined in trigger.parameters.properties"
             )
+
+
+def _validate_conditions(data, issues):
+    """Validate condition definitions.
+
+    CEL expressions (cel_expression) do not support else branching.
+    FQL expressions (expression) alone support else. Model mutually exclusive
+    conditions as parallel branches instead.
+
+    Checks both top-level conditions and conditions nested inside loops.
+    """
+    def _check_conditions_block(conditions):
+        if not isinstance(conditions, dict):
+            return
+        for label, condition in conditions.items():
+            if not isinstance(condition, dict):
+                continue
+            if "cel_expression" in condition and "else" in condition:
+                issues.append(
+                    f"ERROR: Condition '{label}' has both cel_expression and else. "
+                    f"cel_expression does not support else — model mutually exclusive "
+                    f"conditions as separate parallel branches instead (one per branch, no else)."
+                )
+
+    _check_conditions_block(data.get("conditions", {}))
+
+    loops = data.get("loops", {})
+    if isinstance(loops, dict):
+        for loop_def in loops.values():
+            if isinstance(loop_def, dict):
+                _check_conditions_block(loop_def.get("conditions", {}))
 
 
 def _validate_data_refs(file_path, issues):
@@ -210,6 +246,7 @@ def structural_check(file_path):
             _validate_next_refs(label, action, all_labels, issues)
 
     _validate_loops(data, trigger, all_labels, issues)
+    _validate_conditions(data, issues)
     _validate_data_refs(file_path, issues)
 
     return issues
