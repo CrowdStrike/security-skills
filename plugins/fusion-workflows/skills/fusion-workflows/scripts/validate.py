@@ -150,6 +150,29 @@ def _validate_loops(data, trigger, all_labels, issues):
             )
 
 
+def _validate_conditions(data, issues):
+    """Validate condition definitions.
+
+    CEL expressions (cel_expression) do not support else branching.
+    FQL expressions (expression) alone support else. Model mutually exclusive
+    conditions as parallel branches instead.
+    """
+    conditions = data.get("conditions", {})
+    if not isinstance(conditions, dict):
+        return
+
+    for label, condition in conditions.items():
+        if not isinstance(condition, dict):
+            continue
+
+        if "cel_expression" in condition and "else" in condition:
+            issues.append(
+                f"ERROR: Condition '{label}' has both cel_expression and else. "
+                f"cel_expression does not support else — model mutually exclusive "
+                f"conditions as separate parallel branches instead (one per branch, no else)."
+            )
+
+
 def _validate_data_refs(file_path, issues):
     """Check data reference syntax for unclosed expressions."""
     with open(file_path, encoding="utf-8") as f:
@@ -210,6 +233,7 @@ def structural_check(file_path):
             _validate_next_refs(label, action, all_labels, issues)
 
     _validate_loops(data, trigger, all_labels, issues)
+    _validate_conditions(data, issues)
     _validate_data_refs(file_path, issues)
 
     return issues
